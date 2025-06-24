@@ -4,6 +4,7 @@ import morgan from 'morgan';
 import { sequelize } from './db/conexion.js';
 import { PORT } from './config/config.js';
 import AuthRouter from './router/AuthRouter.js';
+import UserRouter from './router/UserRouter.js';
 
 const app = express();
 
@@ -12,7 +13,8 @@ app.use(cors());
 app.use(express.json());
 app.use(morgan('dev'));
 
-app.use('/api/auth', AuthRouter);
+app.use('/api/auth', AuthRouter);//Hicimos el register y login
+app.use('/api/auth', UserRouter);//GetProfile viene del Import UserRouter 
 // Ruta de prueba
 app.get('/', (req, res) => {
   res.send('🚀 API GeoTask funcionando correctamente');
