@@ -1,5 +1,5 @@
 import { body, validationResult } from 'express-validator';
-
+//Register
 export const validateRegister = [
   body('nombre').notEmpty().withMessage('El nombre es obligatorio'),
   body('correo').isEmail().withMessage('Correo no válido'),
@@ -13,3 +13,17 @@ export const validateRegister = [
     next();
   }
 ];
+
+//Login
+export const validateLogin = [
+  body('correo').isEmail().withMessage('Correo no válido'),
+  body('contraseña').notEmpty().withMessage('La contraseña es obligatoria'),
+  (req, res, next) => {
+    const errores = validationResult(req);
+    if (!errores.isEmpty()) {
+      return res.status(400).json({ errores: errores.array() });
+    }
+    next();
+  }
+];
+

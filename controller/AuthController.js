@@ -5,7 +5,7 @@ import { TOKEN_KEY } from '../config/config.js';
 
 
     //AuthController: register, login, forgotPassword, resetPassword
-    
+
 export const registerUser = async (req, res) => {
   const { nombre, correo, contraseña } = req.body;
 
@@ -48,3 +48,45 @@ export const registerUser = async (req, res) => {
     return res.status(500).json({ mensaje: 'Error interno del servidor' });
   }
 };
+
+//Login
+export const loginUser = async (req, res) => {
+  const { correo, contraseña } = req.body;
+
+  try {
+    // Buscar usuario por correo
+    const usuario = await UserModel.findOne({ where: { correo } });
+
+    if (!usuario) {
+      return res.status(400).json({ mensaje: 'Correo o contraseña inválidos' });
+    }
+
+    // Comparar contraseña
+    const match = await bcrypt.compare(contraseña, usuario.contraseña);
+    if (!match) {
+      return res.status(400).json({ mensaje: 'Correo o contraseña inválidos' });
+    }
+
+    // Generar token
+    const token = jwt.sign(
+      { id: usuario.id, correo: usuario.correo },
+      TOKEN_KEY,
+      { expiresIn: '2h' }
+    );
+
+    // Respuesta exitosa
+    return res.status(200).json({
+      mensaje: 'Inicio de sesión exitoso',
+      usuario: {
+        id: usuario.id,
+        nombre: usuario.nombre,
+        correo: usuario.correo
+      },
+      token
+    });
+  } catch (error) {
+    console.error('Error en loginUser:', error);
+    return res.status(500).json({ mensaje: 'Error interno del servidor' });
+  }
+};
+
